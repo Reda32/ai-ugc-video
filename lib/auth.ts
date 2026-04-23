@@ -5,12 +5,12 @@ import {
   onAuthStateChanged,
   User,
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, db } from './firebase';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { getAuthInstance, getDbInstance } from './firebase';
 
 export async function signUp(email: string, password: string): Promise<User> {
-  const credential = await createUserWithEmailAndPassword(auth, email, password);
-  await setDoc(doc(db, 'users', credential.user.uid), {
+  const credential = await createUserWithEmailAndPassword(getAuthInstance(), email, password);
+  await setDoc(doc(getDbInstance(), 'users', credential.user.uid), {
     uid: credential.user.uid,
     email,
     credits: 10,
@@ -20,14 +20,14 @@ export async function signUp(email: string, password: string): Promise<User> {
 }
 
 export async function signIn(email: string, password: string): Promise<User> {
-  const credential = await signInWithEmailAndPassword(auth, email, password);
+  const credential = await signInWithEmailAndPassword(getAuthInstance(), email, password);
   return credential.user;
 }
 
 export async function logOut(): Promise<void> {
-  await signOut(auth);
+  await signOut(getAuthInstance());
 }
 
 export function onAuthChange(callback: (user: User | null) => void) {
-  return onAuthStateChanged(auth, callback);
+  return onAuthStateChanged(getAuthInstance(), callback);
 }

@@ -11,7 +11,7 @@ import {
   serverTimestamp,
   DocumentData,
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { getDbInstance } from './firebase';
 
 // --- User ---
 export interface UserDoc {
@@ -21,12 +21,12 @@ export interface UserDoc {
 }
 
 export async function getUser(uid: string): Promise<UserDoc | null> {
-  const snap = await getDoc(doc(db, 'users', uid));
+  const snap = await getDoc(doc(getDbInstance(), 'users', uid));
   return snap.exists() ? (snap.data() as UserDoc) : null;
 }
 
 export async function updateCredits(uid: string, credits: number): Promise<void> {
-  await updateDoc(doc(db, 'users', uid), { credits });
+  await updateDoc(doc(getDbInstance(), 'users', uid), { credits });
 }
 
 // --- Templates ---
@@ -39,17 +39,17 @@ export interface Template {
 }
 
 export async function getTemplates(): Promise<Template[]> {
-  const snap = await getDocs(collection(db, 'templates'));
+  const snap = await getDocs(collection(getDbInstance(), 'templates'));
   return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Template));
 }
 
 export async function getTemplate(id: string): Promise<Template | null> {
-  const snap = await getDoc(doc(db, 'templates', id));
+  const snap = await getDoc(doc(getDbInstance(), 'templates', id));
   return snap.exists() ? ({ id: snap.id, ...snap.data() } as Template) : null;
 }
 
 export async function addTemplate(data: Omit<Template, 'id'>): Promise<string> {
-  const ref = await addDoc(collection(db, 'templates'), {
+  const ref = await addDoc(collection(getDbInstance(), 'templates'), {
     ...data,
     createdAt: serverTimestamp(),
   });
@@ -71,7 +71,7 @@ export interface VideoDoc {
 
 export async function getUserVideos(uid: string): Promise<VideoDoc[]> {
   const q = query(
-    collection(db, 'videos'),
+    collection(getDbInstance(), 'videos'),
     where('user_id', '==', uid),
     orderBy('createdAt', 'desc')
   );
@@ -84,7 +84,7 @@ export async function createVideoDoc(data: {
   template_id: string;
   face_url: string;
 }): Promise<string> {
-  const ref = await addDoc(collection(db, 'videos'), {
+  const ref = await addDoc(collection(getDbInstance(), 'videos'), {
     ...data,
     output_url: '',
     status: 'pending' as VideoStatus,
@@ -97,5 +97,5 @@ export async function updateVideoDoc(
   videoId: string,
   data: Partial<{ status: VideoStatus; output_url: string }>
 ): Promise<void> {
-  await updateDoc(doc(db, 'videos', videoId), data);
+  await updateDoc(doc(getDbInstance(), 'videos', videoId), data);
 }

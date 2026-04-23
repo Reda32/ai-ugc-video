@@ -1,8 +1,8 @@
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
-import { getFunctions } from 'firebase/functions';
+import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import { getAuth, Auth } from 'firebase/auth';
+import { getFirestore, Firestore } from 'firebase/firestore';
+import { getStorage, FirebaseStorage } from 'firebase/storage';
+import { getFunctions, Functions } from 'firebase/functions';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -13,9 +13,24 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+// Lazy singleton — never initializes at build time, only when first called
+function getFirebaseApp(): FirebaseApp {
+  if (getApps().length) return getApp();
+  return initializeApp(firebaseConfig);
+}
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
-export const functions = getFunctions(app);
+export function getAuthInstance(): Auth {
+  return getAuth(getFirebaseApp());
+}
+
+export function getDbInstance(): Firestore {
+  return getFirestore(getFirebaseApp());
+}
+
+export function getStorageInstance(): FirebaseStorage {
+  return getStorage(getFirebaseApp());
+}
+
+export function getFunctionsInstance(): Functions {
+  return getFunctions(getFirebaseApp());
+}
