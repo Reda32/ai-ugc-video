@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useAuth } from '@/lib/context';
 import { useRouter } from 'next/navigation';
 import { Coins, Film, Library, Zap, ArrowRight } from 'lucide-react';

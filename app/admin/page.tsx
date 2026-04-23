@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useEffect, useRef, useState } from 'react';
 import { addTemplate, getTemplates, Template } from '@/lib/firestore';
 import { uploadPreviewVideo } from '@/lib/storage';
